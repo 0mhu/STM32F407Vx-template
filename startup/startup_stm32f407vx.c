@@ -1,8 +1,8 @@
 /*
-* STM32F030 Linkerscript
-* Copyright (C) 2019 Stefan Strobel <stefan.strobel@shimatta.net>
+* STM32F4 Startup Code for STM32F407 devices
+* Copyright (C) 2017 Mario Hüttel <mario.huettel@gmx.net>
 *
-* This file is part of 'STM32F0 code template'.
+* This file is part of 'STM32F4 code template'.
 *
 * It is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -50,38 +50,7 @@ void PendSV_Handler(void) ALIAS(__int_default_handler);
 void SysTick_Handler(void) ALIAS(__int_default_handler);
 
 /* Peripheral Interrupts (by default mapped onto Default Handler) */
-void WWDG_IRQHandler(void) ALIAS(__int_default_handler);
-void PVD_VDDIO2_IRQHandler(void) ALIAS(__int_default_handler);
-void RTC_IRQHandler(void) ALIAS(__int_default_handler);
-void FLASH_IRQHandler(void) ALIAS(__int_default_handler);
-void RCC_CRS_IRQHandler(void) ALIAS(__int_default_handler);
-void EXTI0_1_IRQHandler(void) ALIAS(__int_default_handler);
-void EXTI2_3_IRQHandler(void) ALIAS(__int_default_handler);
-void EXTI4_15_IRQHandler(void) ALIAS(__int_default_handler);
-void TSC_IRWHandler(void) ALIAS(__int_default_handler);
-void DMA_CH1_IRQHandler(void) ALIAS(__int_default_handler);
-void DMA_CH2_3_DMA2_CH1_2_IRQHandler(void) ALIAS(__int_default_handler);
-void DMA_CH4_5_6_7_DMA2_CH3_4_5_IRQHandler(void) ALIAS(__int_default_handler);
-void ADC_COMP_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM1_BRK_UP_TRG_COM_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM1_CC_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM2_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM3_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM6_DAC_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM7_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM14_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM15_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM16_IRQHandler(void) ALIAS(__int_default_handler);
-void TIM17_IRQHandler(void) ALIAS(__int_default_handler);
-void I2C1_IRQHandler(void) ALIAS(__int_default_handler);
-void I2C2_IRQHandler(void) ALIAS(__int_default_handler);
-void SPI1_IRQHandler(void) ALIAS(__int_default_handler);
-void SPI2_IRQHandler(void) ALIAS(__int_default_handler);
-void USART1_IRQHandler(void) ALIAS(__int_default_handler);
-void USART2_IRQHandler(void) ALIAS(__int_default_handler);
-void USART3_4_5_6_7_8_IRQHandler(void) ALIAS(__int_default_handler);
-void CEC_CAN_IRQHandler(void) ALIAS(__int_default_handler);
-void USB_IRQHandler(void) ALIAS(__int_default_handler);
+
     
 
 extern int main(void);
@@ -98,51 +67,6 @@ void (* const vector_table[])(void) SECTION(".vectors") = {
 	Reset_Handler,
 	NMI_Handler,
 	HardFault_Handler,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	SVCall_Handler,
-	0,
-	0,
-	PendSV_Handler,
-	SysTick_Handler,
-	/* Peripheral Interrupts */
-	WWDG_IRQHandler,
-	PVD_VDDIO2_IRQHandler,
-	RTC_IRQHandler,
-	FLASH_IRQHandler,
-	RCC_CRS_IRQHandler,
-	EXTI0_1_IRQHandler,
-	EXTI2_3_IRQHandler,
-	EXTI4_15_IRQHandler,
-	TSC_IRWHandler,
-	DMA_CH1_IRQHandler,
-	DMA_CH2_3_DMA2_CH1_2_IRQHandler,
-	DMA_CH4_5_6_7_DMA2_CH3_4_5_IRQHandler,
-	ADC_COMP_IRQHandler,
-	TIM1_BRK_UP_TRG_COM_IRQHandler,
-	TIM1_CC_IRQHandler,
-	TIM2_IRQHandler,
-	TIM3_IRQHandler,
-	TIM6_DAC_IRQHandler,
-	TIM7_IRQHandler,
-	TIM14_IRQHandler,
-	TIM15_IRQHandler,
-	TIM16_IRQHandler,
-	TIM17_IRQHandler,
-	I2C1_IRQHandler,
-	I2C2_IRQHandler,
-	SPI1_IRQHandler,
-	SPI2_IRQHandler,
-	USART1_IRQHandler,
-	USART2_IRQHandler,
-	USART3_4_5_6_7_8_IRQHandler,
-	CEC_CAN_IRQHandler,
-	USB_IRQHandler,
 };
 
 static void __init_section(unsigned int *src_start, unsigned int *dest_start, unsigned int *dest_end) {
@@ -163,10 +87,10 @@ static void __fill_zero(unsigned int *start, unsigned int *end) {
 }
 
 extern unsigned int __ld_load_data;
-extern unsigned int __ld_sitcm;
-extern unsigned int __ld_eitcm;
-extern unsigned int __ld_sdtcm;
-extern unsigned int __ld_edtcm;
+extern unsigned int __ld_sdata_ccm;
+extern unsigned int __ld_edata_ccm;
+extern unsigned int __ld_sbss_ccm;
+extern unsigned int __ld_ebss_ccm;
 extern unsigned int __ld_sdata;
 extern unsigned int __ld_edata;
 extern unsigned int __ld_sbss;
@@ -183,8 +107,12 @@ void Reset_Handler(void) {
 	__fill_zero(&__ld_sbss, &__ld_ebss);
 	/* Fill Heap with zero */
 	__fill_zero(&__ld_sheap, &__ld_eheap);
+
+	/* Fill static CCM memory with zeroes */
+	__fill_zero(&__ld_sbss_ccm, &__ld_ebss_ccm);
+
 	/* Set clocks, waitstates, ART operation etc. */
-	__system_init();
+	SystemInit();
 	
 	/* C++ init function */
 #if defined(__cplusplus)

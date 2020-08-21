@@ -3,7 +3,7 @@
 #Compiler:	arm-none-eabi
 #####################################################################################
 #Add Files and Folders below#########################################################
-CFILES 	= main.c
+CFILES 	= main.c startup/startup_stm32f407vx.c setup/system_stm32f4xx.c
 ASFILES =
 INCLUDEPATH = -Iinclude -Imathlib/include
 

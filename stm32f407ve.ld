@@ -28,7 +28,7 @@ __ld_heap_size  = 0x0500;
 
 /* END OF USER PARAMETERS */
 ENTRY(Reset_Handler)
-__ld_top_of_stack = 0x20001000; /* One byte above the end of the SRAM. Stack is pre-decrewmenting, so this is okay */
+__ld_top_of_stack = 0x20020000; /* One byte above the end of the SRAM. Stack is pre-decrewmenting, so this is okay */
 
 
 /* Available memory areas */
@@ -99,8 +99,8 @@ SECTIONS
   	} >FLASH
 
 	/* Initialized CCM data */
-	__ld_load_ccm_data = LOADADDR(.ccm.data)
-	.ccm.data : 
+	__ld_load_ccm_data = LOADADDR(.ccmdata);
+	.ccmdata : 
 	{
 		. = ALIGN(4);
 		__ld_sdata_ccm = .;	
@@ -110,7 +110,7 @@ SECTIONS
 		__ld_edata_ccm = .;
 	} >CCM AT> FLASH
 	
-	.ccm.bss (NOLOAD) : 
+	.ccmbss (NOLOAD) : 
 	{
 		. = ALIGN(4);
 		__ld_sbss_ccm = .;	
