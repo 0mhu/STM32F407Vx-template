@@ -20,7 +20,7 @@
 * RAM: 128K
 * CCM RAM: 64L
 * FPU: fpv4-sp-d16
-* 
+*/ 
 
 /* USER PARAMETERS */
 __ld_stack_size = 0x1000;
@@ -35,8 +35,8 @@ __ld_top_of_stack = 0x20020000; /* One byte above the end of the SRAM. Stack is 
 MEMORY
 {
 	FLASH (xr)	: ORIGIN = 0x08000000, LENGTH = 512K
-	RAM (xrw)	: ORIGIN = 0x20000000, LENGTH = 128K	
-	CCM (xrw)	: ORIGIN = 0x10000000, LENGTH = 64K
+	RAM (xrw)	: ORIGIN = 0x20000000, LENGTH = 128K
+	CCM (rw)	: ORIGIN = 0x10000000, LENGTH = 64K
 }
 
 SECTIONS
