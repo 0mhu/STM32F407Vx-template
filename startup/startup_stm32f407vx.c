@@ -280,8 +280,22 @@ extern unsigned int __ld_ebss;
 extern unsigned int __ld_sheap;
 extern unsigned int __ld_eheap;
 
+#ifdef CPACR
+#undef CPACR
+#endif
+
+#define CPACR (*((volatile uint32_t *)0xE000ED88))
+
 void Reset_Handler(void) {
 	/* Stack is already initialized by hardware */
+
+	/* The first thing we do here, is to initialize the FPU
+	 * When this code is compiled optimized with hardfpu abi,
+	 * GCC tends to generate FPU instructions for data copying
+	 */
+#if __FPU_USED == 1
+	CPACR |= (0xF << 20);
+#endif
 
 	/* Copy .data section */
 	__init_section(&__ld_load_data, &__ld_sdata, &__ld_edata);
