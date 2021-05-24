@@ -41,16 +41,14 @@ MEMORY
 
 SECTIONS
 {
-	.vectors :
+	.vectors : ALIGN(4)
 	{
-		. = ALIGN(4);
 		KEEP(*(.vectors))
 		. = ALIGN(4);
 	} >FLASH
 	
-	.text :
+	.text : ALIGN(4)
 	{
-		. = ALIGN(4);
 		*(.text)           /* .text sections (code) */
     		*(.text*)          /* .text* sections (code) */
     		*(.rodata)         /* .rodata sections (constants, strings, etc.) */
@@ -60,27 +58,28 @@ SECTIONS
 		*(.eh_frame)
 		KEEP(*(.init))	   /* Constructors */
 		KEEP(*(.fini))     /* Destructors  */
-	} >FLASH
+		. = ALIGN(4);
+	} >FLASH =0xFF
 	
-	.ARM.extab : 
+	.ARM.extab : ALIGN(4)
 	{ 
 		*(.ARM.extab* .gnu.linkonce.armextab.*) 
-	} >FLASH
+	} >FLASH =0xFF
 	
-	.ARM :
+	.ARM : ALIGN(4)
 	{
     		__exidx_start = .;
       		*(.ARM.exidx*)
       		__exidx_end = .;
-   	} >FLASH
+   	} >FLASH =0xFF
 	
 	/* Constructor/Destructor tables */
- 	.preinit_array     :
+ 	.preinit_array : ALIGN(4)
 	{
     		PROVIDE_HIDDEN (__preinit_array_start = .);
     		KEEP (*(.preinit_array*))
     		PROVIDE_HIDDEN (__preinit_array_end = .);
-  	} >FLASH
+  	} >FLASH =0xFF
   	
 	.init_array :
   	{
@@ -88,7 +87,7 @@ SECTIONS
     		KEEP (*(SORT(.init_array.*)))
     		KEEP (*(.init_array*))
     		PROVIDE_HIDDEN (__init_array_end = .);
-  	} >FLASH
+  	} >FLASH =0xFF
   
 	.fini_array :
 	{
@@ -96,13 +95,14 @@ SECTIONS
     		KEEP (*(.fini_array*))
     		KEEP (*(SORT(.fini_array.*)))
     		PROVIDE_HIDDEN (__fini_array_end = .);
-  	} >FLASH
+    		/* Ensure the flash is aligned at a 32 bit word boundary */
+    		. = ALIGN(4);
+  	} >FLASH =0xFF
 
 	/* Initialized CCM data */
 	__ld_load_ccm_data = LOADADDR(.ccmdata);
-	.ccmdata : 
+	.ccmdata : ALIGN(4)
 	{
-		. = ALIGN(4);
 		__ld_sdata_ccm = .;	
 		*(.ccm.data)
 		*(.ccm.data*)
@@ -110,9 +110,8 @@ SECTIONS
 		__ld_edata_ccm = .;
 	} >CCM AT> FLASH
 	
-	.ccmbss (NOLOAD) : 
+	.ccmbss (NOLOAD) : ALIGN(4)
 	{
-		. = ALIGN(4);
 		__ld_sbss_ccm = .;	
 		*(.ccm.bss)
 		*(.ccm.bss*)
@@ -122,9 +121,8 @@ SECTIONS
 
 	/* Initialized Data */
 	__ld_load_data = LOADADDR(.data);
-	.data : 
+	.data : ALIGN(4)
 	{
-		. = ALIGN(4);
 		__ld_sdata = .;
 		*(.data)
 		*(.data*)
@@ -133,9 +131,8 @@ SECTIONS
 	} >RAM AT> FLASH
 	
 	/* Uninitialized static data */
-	.bss (NOLOAD) :
+	.bss (NOLOAD) : ALIGN(4)
 	{
-		. = ALIGN(4);
 		__ld_sbss = .;
 		*(.bss)
 		*(.bss*)
@@ -144,9 +141,8 @@ SECTIONS
 		__ld_ebss = .;
 	} >RAM
 
-	.heap_stack (NOLOAD) :
+	.heap_stack (NOLOAD) : ALIGN(4)
 	{
-		. = ALIGN(4);
 		__ld_sheap = .;
 		. = . + __ld_heap_size;
 		__ld_eheap = .;
